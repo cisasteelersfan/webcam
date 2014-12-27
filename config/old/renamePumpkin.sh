@@ -1,0 +1,17 @@
+    COUNTER=0
+    DirDate=$(date +%m-%d-%y-%T)
+    mkdir ~/webcam/$DirDate
+    for OLDNAME in ~/webcam/temp/*.jpg; do
+        while true; do
+            COUNTER=$(($COUNTER+1))
+            NEWNAME=~/webcam/$DirDate/`printf '%08d.jpg' $COUNTER`
+            if [ ! -e $NEWNAME ]; then break; fi
+        done
+        mv "$OLDNAME" "$NEWNAME"
+    done
+    avconv -f image2 -i ~/webcam/$DirDate/%08d.jpg -vcodec h264 -crf 30 -r 30 ~/webcam/video$DirDate.avi
+	read -p "View Now? (y/n)"
+	[ "$REPLY" == "y" ] && vlc ~/webcam/video$DirDate.avi
+	read -p "Copy to colby-pc now? (y/n)"
+	[ "$REPLY" == "y" ] && scp ~/webcam/video$DirDate.avi colby@192.168.1.101:~/webcam/video$DirDate.avi
+
